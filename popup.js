@@ -3,6 +3,8 @@
 document.addEventListener('DOMContentLoaded', () => {
   const extractBtn = document.getElementById('extractBtn');
   const copyBtn = document.getElementById('copyBtn');
+  const saveBtn = document.getElementById('saveBtn');
+  const settingsLink = document.getElementById('settingsLink');
   const statusDiv = document.getElementById('status');
   const contentDiv = document.getElementById('content');
 
@@ -106,6 +108,73 @@ document.addEventListener('DOMContentLoaded', () => {
     const fullText = `Content from ${currentContent.url}\nExtracted at: ${currentContent.timestamp}\n\n${text}`;
     copyToClipboard(fullText);
   });
+
+  // Save content to Cloudflare Worker
+  saveBtn.addEventListener('click', async () => {
+    if (!currentContent || !currentContent.quotes || currentContent.quotes.length === 0) {
+      setStatus('No content to save', 'error');
+      return;
+    }
+
+    // Get worker URL from settings
+    chrome.storage.sync.get({ workerUrl: '' }, async (items) => {
+      if (!items.workerUrl) {
+        setStatus('Please configure Worker endpoint in settings', 'error');
+        return;
+      }
+
+      await saveToWorker(items.workerUrl, currentContent);
+    });
+  });
+
+  // Open settings page
+  settingsLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    chrome.runtime.openOptionsPage();
+  });
+
+  // Function to save content to worker
+  async function saveToWorker(workerUrl, content) {
+    saveBtn.disabled = true;
+    const originalText = saveBtn.textContent;
+    saveBtn.textContent = 'Saving...';
+
+    try {
+      const response = await fetch(`${workerUrl}/api/save`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(content)
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setStatus(`Saved successfully! ID: ${data.id}`, 'success');
+
+        // Show notification if enabled
+        chrome.storage.sync.get({ showNotifications: true }, (items) => {
+          if (items.showNotifications) {
+            chrome.notifications?.create({
+              type: 'basic',
+              iconUrl: 'icons/icon48.png',
+              title: 'Content Saved',
+              message: `${data.quotesCount} quotes saved to worker`
+            });
+          }
+        });
+      } else {
+        setStatus(`Save failed: ${data.error || 'Unknown error'}`, 'error');
+      }
+    } catch (error) {
+      setStatus(`Save failed: ${error.message}`, 'error');
+      console.error('Save error:', error);
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = originalText;
+    }
+  }
 
   // Load any previously stored content
   chrome.storage.local.get(['latestContent'], (result) => {

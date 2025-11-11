@@ -123,6 +123,29 @@
       padding: 20px;
       color: #666;
     }
+
+    .btn-secondary {
+      background: #2196F3;
+    }
+
+    .btn-secondary:hover {
+      background: #1976D2;
+    }
+
+    .settings-link {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 12px;
+    }
+
+    .settings-link a {
+      color: #2196F3;
+      text-decoration: none;
+    }
+
+    .settings-link a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -137,10 +160,18 @@
     <button id="copyBtn">Copy All</button>
   </div>
 
+  <div class="button-group">
+    <button id="saveBtn" class="btn-secondary">Save to Worker</button>
+  </div>
+
   <div id="content">
     <div class="empty-state">
       Click "Extract Content" to read quotes from thebash.com
     </div>
+  </div>
+
+  <div class="settings-link">
+    <a href="#" id="settingsLink">Configure Worker Endpoint</a>
   </div>
 
   <script src="popup.js"></script>

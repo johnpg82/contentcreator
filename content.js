@@ -61,6 +61,32 @@
     return true; // Keep the message channel open for async response
   });
 
+  // Function to save content to worker
+  async function saveToWorker(workerUrl, content) {
+    try {
+      const response = await fetch(`${workerUrl}/api/save`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(content)
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        console.log('Content auto-saved to worker:', data.id);
+        return { success: true, id: data.id };
+      } else {
+        console.error('Failed to auto-save content:', data.error);
+        return { success: false, error: data.error };
+      }
+    } catch (error) {
+      console.error('Error auto-saving content:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
   // Automatically extract content when page loads and store it
   window.addEventListener('load', () => {
     const content = extractBashContent();
@@ -70,6 +96,14 @@
       'latestContent': content
     }, () => {
       console.log('TheBash.com content extracted and stored:', content);
+    });
+
+    // Check if auto-save is enabled
+    chrome.storage.sync.get({ autoSave: false, workerUrl: '' }, async (items) => {
+      if (items.autoSave && items.workerUrl) {
+        console.log('Auto-save enabled, saving to worker...');
+        await saveToWorker(items.workerUrl, content);
+      }
     });
   });
 

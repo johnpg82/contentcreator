@@ -1,0 +1,25 @@
+{
+  "name": "thebash-content-storage",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker for storing thebash.com content",
+  "main": "index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "db:create": "wrangler d1 create thebash-content",
+    "db:init": "wrangler d1 execute thebash-content --file=./schema.sql",
+    "db:init:local": "wrangler d1 execute thebash-content --local --file=./schema.sql"
+  },
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "thebash",
+    "content-storage"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}
