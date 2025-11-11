@@ -1,26 +1,42 @@
-# Cloudflare Workers configuration
-name = "thebash-content-storage"
-main = "index.js"
+# Cloudflare Workers configuration for Lead Management System
+name = "lead-management-system"
+main = "lead-manager.js"
 compatibility_date = "2024-01-01"
 
-# Uncomment and configure if using D1 Database
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "thebash-content"
-# database_id = "your-database-id-here"
+# D1 Database (REQUIRED)
+# Uncomment and configure after creating your D1 database:
+# Run: wrangler d1 create lead-management-db
+[[d1_databases]]
+binding = "DB"
+database_name = "lead-management-db"
+database_id = "your-database-id-here"  # Replace with actual ID
 
-# Uncomment and configure if using KV Storage
-# [[kv_namespaces]]
-# binding = "CONTENT_STORE"
-# id = "your-kv-namespace-id-here"
+# R2 Storage for file uploads (REQUIRED)
+# Uncomment and configure after creating your R2 bucket:
+# Run: wrangler r2 bucket create lead-files
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "lead-files"
 
-# Environment variables (optional)
-# [vars]
-# ENVIRONMENT = "production"
+# Environment variables
+[vars]
+R2_BUCKET_NAME = "lead-files"
+ENVIRONMENT = "production"
+
+# Secrets (set via: wrangler secret put ANTHROPIC_API_KEY)
+# ANTHROPIC_API_KEY = "your-api-key"  # Don't put the actual key here!
 
 # For local development
 [env.dev]
-# [[env.dev.d1_databases]]
-# binding = "DB"
-# database_name = "thebash-content-dev"
-# database_id = "your-dev-database-id-here"
+[[env.dev.d1_databases]]
+binding = "DB"
+database_name = "lead-management-db-dev"
+database_id = "your-dev-database-id-here"
+
+[[env.dev.r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "lead-files-dev"
+
+[env.dev.vars]
+R2_BUCKET_NAME = "lead-files-dev"
+ENVIRONMENT = "development"

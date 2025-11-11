@@ -1,21 +1,28 @@
 {
-  "name": "thebash-content-storage",
-  "version": "1.0.0",
-  "description": "Cloudflare Worker for storing thebash.com content",
-  "main": "index.js",
+  "name": "lead-management-system",
+  "version": "2.0.0",
+  "description": "AI-powered lead management system with Cloudflare Workers, D1, and R2",
+  "main": "lead-manager.js",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "tail": "wrangler tail",
-    "db:create": "wrangler d1 create thebash-content",
-    "db:init": "wrangler d1 execute thebash-content --file=./schema.sql",
-    "db:init:local": "wrangler d1 execute thebash-content --local --file=./schema.sql"
+    "db:create": "wrangler d1 create lead-management-db",
+    "db:create:dev": "wrangler d1 create lead-management-db-dev",
+    "db:init": "wrangler d1 execute lead-management-db --file=./schema.sql",
+    "db:init:local": "wrangler d1 execute lead-management-db --local --file=./schema.sql",
+    "r2:create": "wrangler r2 bucket create lead-files",
+    "r2:create:dev": "wrangler r2 bucket create lead-files-dev",
+    "secret:set": "wrangler secret put ANTHROPIC_API_KEY"
   },
   "keywords": [
     "cloudflare",
     "workers",
-    "thebash",
-    "content-storage"
+    "lead-management",
+    "ai",
+    "crm",
+    "d1",
+    "r2"
   ],
   "author": "",
   "license": "MIT",
